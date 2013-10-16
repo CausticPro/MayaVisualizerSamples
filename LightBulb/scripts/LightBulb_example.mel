@@ -1,0 +1,67 @@
+//
+// LightBulb_example.mel
+// $Revision: #1 
+//
+
+/****
+TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW, THIS SOFTWARE IS PROVIDED
+*AS IS* AND IMAGINATION TECHNOLOGIES AND ITS SUPPLIERS DISCLAIM ALL WARRANTIES, EITHER
+EXPRESS OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, IMPLIED WARRANTIES OF MERCHANTABILITY
+AND FITNESS FOR A PARTICULAR PURPOSE.  IN NO EVENT SHALL IMAGINATION TECHNOLOGIES OR ITS
+SUPPLIERS BE LIABLE FOR ANY SPECIAL, INCIDENTAL, INDIRECT, OR CONSEQUENTIAL DAMAGES
+WHATSOEVER (INCLUDING, WITHOUT LIMITATION, DAMAGES FOR LOSS OF BUSINESS PROFITS,
+BUSINESS INTERRUPTION, LOSS OF BUSINESS INFORMATION, OR ANY OTHER PECUNIARY
+LOSS) ARISING OUT OF THE USE OF OR INABILITY TO USE THIS SOFTWARE, EVEN IF
+IMAGINATION TECHNOLOGIES HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
+***/
+
+// Maya scene is required to run this script. 
+// Example mel script for creating a slider to control both intensity of Maya light and 
+// brightness of light bulb's material shader, using slider's 0 to 1 value. 
+//   
+//
+// TO USE:
+//	Just place this in your Mel Path & run ...........
+//
+
+/////////////////////////////////////////////////////
+/////////////////////////////////////////////////////
+/////////////////////////////////////////////////////
+
+// proc to update light and material values based on floatslidergrp's value
+proc change_light(){
+    float $value = `floatSliderGrp -q -v light_slider` ;
+    
+    //set light intensity
+    setAttr "DayLightShape.intensity" ($value * 2.2) ;
+    
+    //adjust light bulb
+    setAttr "blendColors1.blender" $value;
+    setAttr "blendColors2.blender" $value;
+    setAttr "blendColors3.blender" $value;
+    setAttr "blendColors4.blender" $value;
+}
+
+// global proc
+global proc LightBulb_Ctrl()
+{
+	if (`window -exists SPDemoWindow`)
+	deleteUI -window SPDemoWindow;
+ 
+	string $SP_Demo = `window -menuBar true -title "Caustic Visualizer Example"
+    -rtf 1
+    SPDemoWindow`;
+  
+	frameLayout -label "Time of Day Control" -borderStyle "in" SPframe; //-w 400;
+		columnLayout -columnAttach "both" 5 -rowSpacing 10 -columnWidth 400 SPcolumn;
+		floatSliderGrp -label "Night" -extraLabel "Day" 
+		-field true
+		-minValue 0 -maxValue 1
+		-value 0
+		-dc change_light light_slider;
+		setParent ..;
+	setParent ..;
+
+	showWindow $SP_Demo;
+}
+
